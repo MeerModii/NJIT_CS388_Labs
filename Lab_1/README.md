@@ -2,6 +2,9 @@
 
 A simple Android application built with Kotlin and XML-based layouts for Unit 1 Lab.
 
+## Demo
+https://github.com/user-attachments/assets/bc04cd93-245d-4cd9-91c3-31e188e2c86e
+
 ## Features
 - **Tap to Increment**: Click the "TAP" button to increase the counter.
 - **Dynamic UI**: The count updates in real-time on the screen.
@@ -19,6 +22,5 @@ A simple Android application built with Kotlin and XML-based layouts for Unit 1 
 2. Add a `penguin.png` image to the `app/src/main/res/drawable` folder.
 3. Build and run the app on an emulator or physical device.
 
-## Demo
-https://github.com/user-attachments/assets/bc04cd93-245d-4cd9-91c3-31e188e2c86e
+
 
