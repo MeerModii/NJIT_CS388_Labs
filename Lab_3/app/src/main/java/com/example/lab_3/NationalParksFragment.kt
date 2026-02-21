@@ -5,8 +5,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.codepath.asynchttpclient.AsyncHttpClient
 import com.codepath.asynchttpclient.RequestParams
@@ -27,6 +29,9 @@ class NationalParksFragment : Fragment(), OnListFragmentInteractionListener {
         val view = inflater.inflate(R.layout.fragment_national_parks_list, container, false)
         val progressBar = view.findViewById<View>(R.id.progress) as ContentLoadingProgressBar
         val recyclerView = view.findViewById<View>(R.id.list) as RecyclerView
+        
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        
         updateAdapter(progressBar, recyclerView)
         return view
     }
@@ -37,6 +42,8 @@ class NationalParksFragment : Fragment(), OnListFragmentInteractionListener {
         val client = AsyncHttpClient()
         val params = RequestParams()
         params["api_key"] = API_KEY
+        // Optional: Get more parks by setting a limit
+        params["limit"] = "20"
 
         client["https://developer.nps.gov/api/v1/parks", params, object : JsonHttpResponseHandler() {
             override fun onSuccess(
@@ -55,11 +62,15 @@ class NationalParksFragment : Fragment(), OnListFragmentInteractionListener {
 
                     val models: List<NationalPark> = gson.fromJson(parksRawJSON, arrayParkType)
 
-                    recyclerView.adapter = NationalParksRecyclerViewAdapter(models, this@NationalParksFragment)
-
-                    Log.d("NationalParksFragment", "response successful")
+                    if (models.isEmpty()) {
+                        Toast.makeText(context, "No parks found", Toast.LENGTH_SHORT).show()
+                    } else {
+                        recyclerView.adapter = NationalParksRecyclerViewAdapter(models, this@NationalParksFragment)
+                        Log.d("NationalParksFragment", "Successfully loaded ${models.size} parks")
+                    }
                 } catch (e: Exception) {
                     Log.e("NationalParksFragment", "Parsing error: ${e.message}")
+                    Toast.makeText(context, "Failed to parse data", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -70,13 +81,14 @@ class NationalParksFragment : Fragment(), OnListFragmentInteractionListener {
                 throwable: Throwable?
             ) {
                 progressBar.hide()
-                Log.e("NationalParksFragment", errorResponse)
+                val message = "API Error: $statusCode"
+                Log.e("NationalParksFragment", "$message - $errorResponse")
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             }
         }]
     }
 
     override fun onItemClick(item: NationalPark) {
-        // Handle item click if needed
         Log.d("NationalParksFragment", "Clicked on ${item.name}")
     }
 }
